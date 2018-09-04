@@ -1,0 +1,32 @@
+[
+    {
+        "name":"Star Trek TOS Communicator",
+        "price": 144.99,
+        "picture": "assets/products/iphv_tos_st_bt_communicator.jpg"
+    },
+    {
+        "name":"Twelfth Doctor's Sonic Screwdriver",
+        "price": 119.99,
+        "picture": "assets/products/imkj_12th_doc_sonic_screw_remote.jpg"
+    },
+    {
+        "name":"Hitchhiker's Guide to the Galaxy Towel",
+        "price": 99.99,
+        "picture": "assets/products/towel.jpg"
+    },
+    {
+        "name":"Star Wars Force FX Lightsabers",
+        "price": 149.99,
+        "picture": "assets/products/irov_sw_force_fx_lightsabers_v2_combo.jpg"
+    },
+    {
+        "name":"Star Trek Phaser",
+        "price": 149.99,
+        "picture": "assets/products/1db4_star_trek_phaser_remote_replica.jpg"
+    },
+    {
+        "name":"The Tenth Doctor'S Sonic Screwdriver",
+        "price": 64.99,
+        "picture": "assets/products/51TcWwKlxvL._SY355_.jpg"
+    }
+]
