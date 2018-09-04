@@ -1,24 +1,31 @@
 (function(){
 
     $.getJSON( "js/products.json", function( products ) {
-        var items = [];
-        products.forEach( product => {
-            items.push( `
-                <div>
-                    <h2>${product.name}</h2>
-                    <em>${product.price}</em><br/>
-                    <img src="${product.picture}"/>
-                </div>`
+        const items = [];
+        products.forEach( (product) => {
+            items.push(
+            `<div class="col-12 col-md-6 col-lg-4">
+                <div class="card product" data-price="${product.price}" data-name="${product.name}">
+                    <img class="card-img-top" src="${product.picture}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <p class="card-text">${product.price}</p>
+                        <a href="#" class="btn btn-primary add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+            </div>`
             );
         });
-       
-        $( "<section/>", {
-            "class": "products",
-            html: items.join( "" )
-        }).appendTo( "body" );
-      });
+        $("#products").append(items.join( "" ));
+    });
 
 
+    $("#products").on('click', '.add-to-cart', function(e){
+        const $product = $(e.target).closest('.product')
+        const price = $product.data('price');
+        const name = $product.data('name');
+        console.log(price, name);
+    });
 
 })();
 
