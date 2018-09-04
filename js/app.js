@@ -46,12 +46,14 @@
             });
             
             this.calculateTotal();
+            this.updateButton();
             this.render();
         };
 
         this.removeFromCart = function(index) {
             this.items.splice(index,1);
             this.calculateTotal();
+            this.updateButton();
             this.render();
         };
         
@@ -62,8 +64,9 @@
         }
         
         this.render = function(){
-            $('#cartTotal').html( ` $ ${this.total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
-            $('#modalTotal').html( ` $ ${this.total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+            $('#cartTotal').html(` $ ${this.total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+            $('#modalTotal').html(` $ ${this.total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+            
             let itemsString = "";
             this.items.forEach( (product, index) => {
                 itemsString +=  `
@@ -76,63 +79,69 @@
             
             $("#cartItems").html(itemsString);
         }
+        this.updateButton = function(){
+    
+            const items = this.items.map( item => {
+                return  {
+                    name: item.name,
+                    quantity: '1',
+                    price: item.price,
+                    currency: 'MXN'
+                }
+            });
+            
+            const truncatedTotal = parseInt(this.total*100)/100;
+            $('#paypal-button').empty();
+            
+            paypal.Button.render({
+                // Configure environment
+                env: 'sandbox',
+                client: {
+                    sandbox: 'AUykpVrNuc8Ngg4dFr45MlAlubVE_5ThVmTquYk1LTuDj1wlQLmOMFTrCShOTlkK7N9q6LMcmsB3H5x7',
+                    production: 'demo_production_client_id'
+                },
+                // Customize button (optional)
+                locale: 'es_MX',
+                style: {
+                    size: 'small',
+                    color: 'gold',
+                    shape: 'pill',
+                },
+                // Set up a payment
+                payment: function (data, actions) {
+                    return actions.payment.create({
+                        transactions: [{
+                            amount: {
+                                total: truncatedTotal,
+                                currency: 'MXN',
+                            },
+                            description: 'Pedido asombroso dela tienda de Levhita',
+                            custom: '90048630024435',
+                            //invoice_number: '12345', Insert a unique invoice number
+                            payment_options: {
+                                allowed_payment_method: 'INSTANT_FUNDING_SOURCE'
+                            },
+                            soft_descriptor: "Levhita's store",
+                            item_list: { items: items }
+                        }],
+                        note_to_payer: 'Contácteme en caso de algún error con el pedido.'
+                    });
+                },
+                // Execute the payment
+                onAuthorize: function (data, actions) {
+                    return actions.payment.execute()
+                    .then(function () {
+                        alert('Venta completada exitosamente');
+                        cart.items=[];
+                        cart.calculateTotal();
+                        cart.render();
+                    });
+                }
+            }, '#paypal-button');
+        }
     }
 
     const cart = new Cart();
     cart.render();
 })();
 
-/*paypal.Button.render({
-    // Configure environment
-    env: 'sandbox',
-    client: {
-        sandbox: 'AUykpVrNuc8Ngg4dFr45MlAlubVE_5ThVmTquYk1LTuDj1wlQLmOMFTrCShOTlkK7N9q6LMcmsB3H5x7',
-        production: 'demo_production_client_id'
-    },
-    // Customize button (optional)
-    locale: 'es_MX',
-    style: {
-        size: 'small',
-        color: 'gold',
-        shape: 'pill',
-    },
-    // Set up a payment
-    payment: function (data, actions) {
-        return actions.payment.create({
-            transactions: [{
-                amount: {
-                    total: '300',
-                    currency: 'MXN',
-                },
-                description: 'Pedido asombroso de 300 pesos',
-                custom: '90048630024435',
-                //invoice_number: '12345', Insert a unique invoice number
-                payment_options: {
-                    allowed_payment_method: 'INSTANT_FUNDING_SOURCE'
-                },
-                soft_descriptor: 'ECHI5786786',
-                item_list: {
-                    items: [
-                    {
-                        name: 'Sombrero',
-                        description: 'Brown hat.',
-                        quantity: '10',
-                        price: '30',
-                        sku: '1',
-                        currency: 'MXN'
-                    }
-                    ]
-                }
-            }],
-            note_to_payer: 'Contactenme en caso de algún error con el pedido.'
-        });
-    },
-    // Execute the payment
-    onAuthorize: function (data, actions) {
-        return actions.payment.execute()
-        .then(function () {
-            // Show a confirmation message to the buyer
-            window.alert('Thank you for your purchase!');
-        });
-    }
-}, '#paypal-button');*/
