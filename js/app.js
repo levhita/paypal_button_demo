@@ -1,32 +1,85 @@
 (function(){
 
     $.getJSON( "js/products.json", function( products ) {
-        const items = [];
+        let itemsString = "";
         products.forEach( (product) => {
-            items.push(
+            itemsString += 
             `<div class="col-12 col-md-6 col-lg-4">
                 <div class="card product" data-price="${product.price}" data-name="${product.name}">
                     <img class="card-img-top" src="${product.picture}" alt="Card image cap">
                     <div class="card-body">
                         <h5 class="card-title">${product.name}</h5>
-                        <p class="card-text">${product.price}</p>
+                        <p class="card-text">$ ${product.price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</p>
                         <a href="#" class="btn btn-primary add-to-cart">Add to Cart</a>
                     </div>
                 </div>
-            </div>`
-            );
+            </div>` ;
         });
-        $("#products").append(items.join( "" ));
+        $("#products").html(itemsString);
     });
-
 
     $("#products").on('click', '.add-to-cart', function(e){
-        const $product = $(e.target).closest('.product')
-        const price = $product.data('price');
+        e.preventDefault();
+        
+        const $product = $(e.target).closest('.product');
         const name = $product.data('name');
-        console.log(price, name);
+        const price = $product.data('price');
+        cart.addToCart(name, price);
+    
     });
 
+    $("#cartItems").on('click', '.remove', function(e){
+        e.preventDefault();
+        const index =$(e.target).data('index');
+        cart.removeFromCart(index);
+    });
+
+    function Cart(){
+        
+        this.total = 0;
+        this.items = [];
+        
+        this.addToCart = function(name, price) {
+            this.items.push({
+                price: price,
+                name: name,
+            });
+            
+            this.calculateTotal();
+            this.render();
+        };
+
+        this.removeFromCart = function(index) {
+            this.items.splice(index,1);
+            this.calculateTotal();
+            this.render();
+        };
+        
+        this.calculateTotal = function(){
+            this.total = this.items.reduce(function(sum, item) {
+                return sum + item.price;
+            }, 0);
+        }
+        
+        this.render = function(){
+            $('#cartTotal').html( ` $ ${this.total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+            $('#modalTotal').html( ` $ ${this.total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+            let itemsString = "";
+            this.items.forEach( (product, index) => {
+                itemsString +=  `
+                <div>
+                    <strong>${product.name}:</strong>
+                    $ ${product.price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                    <button data-index="${index}" class="btn btn-primary remove">Remove</button>
+                </div>` ;
+            });
+            
+            $("#cartItems").html(itemsString);
+        }
+    }
+
+    const cart = new Cart();
+    cart.render();
 })();
 
 /*paypal.Button.render({
