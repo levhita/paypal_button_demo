@@ -113,7 +113,7 @@
                         transactions: [{
                             amount: {
                                 total: truncatedTotal,
-                                currency: 'MXN',
+                                currency: 'USD',
                             },
                             description: 'Pedido asombroso dela tienda de Levhita',
                             custom: '90048630024435',
